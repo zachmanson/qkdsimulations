@@ -60,4 +60,18 @@ def generateNoise(bits, rate):
 
     return bits
 
-
+def get_encoded_list(bits, bases):
+    a = []
+    for i in range(len(bits)):
+        if bits[i] == 0:
+            if bases[i] == 'X':
+                a.append('↑')
+            else:
+                a.append('↖')
+        else:
+            if bases[i] == 'X':
+                a.append('→')
+            else:
+                a.append('↗')
+        
+    return a

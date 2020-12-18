@@ -23,14 +23,18 @@ def generateBases(N):
         
     return bases
 
-def sift_bits(bits, bases, otherBases):
+def sift_bits(bits, bases, other_bases):
     key = []
+    key_for_print = []
 
     for i in range(len(bits)):
-        if bases[i] == otherBases[i]:
+        if bases[i] == other_bases[i]:
             key.append(bits[i])
+            key_for_print.append(str(bits[i]))
+        else:
+            key_for_print.append(' ')
 
-    return key
+    return key, key_for_print
 
 def discloseBits(alice_bits, bob_bits):
     temp = np.arange(0, len(alice_bits))

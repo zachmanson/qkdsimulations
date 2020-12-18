@@ -64,6 +64,11 @@ def simulateBB84(N, eavesdrop_rate, error_rate, eve, detailed):
         print('Alice encodes her bits using her basis choice, and sends the encrypted bits to Bob')
     
     alice_sent = bb84.encode(alice_bits, alice_bases)
+    encoded_list = bb84.get_encoded_list(alice_bits, alice_bases)
+
+    if detailed:
+        print("Encoded qubit polarizations:\n", tools.list_to_string(encoded_list), sep = '')
+
 
     if eve:
         eve_bases = tools.generateBases(int(N * eavesdrop_rate))
@@ -96,8 +101,9 @@ def simulateBB84(N, eavesdrop_rate, error_rate, eve, detailed):
         print("Bob's measured bits:\n", tools.list_to_string(bob_bits), sep='')
         print("Alice and Bob share their basis choices, and generate their own keys.")
 
-    alice_sifted = tools.sift_bits(alice_bits, alice_bases, bob_bases)
-    bob_sifted = tools.sift_bits(bob_bits, bob_bases, alice_bases)
+    alice_sifted, alice_sifted_for_print = tools.sift_bits(alice_bits, alice_bases, bob_bases)
+    bob_sifted, bob_sifted_for_print = tools.sift_bits(bob_bits, bob_bases, alice_bases)
+
 
     if detailed:
         print("Alice's sifted key:\n",tools.list_to_string(alice_sifted), sep='')
@@ -126,12 +132,15 @@ def simulateBB84(N, eavesdrop_rate, error_rate, eve, detailed):
         alice_temp = alice_postDisclose.copy() # we want to keep the string of bits before running CASCADE for printing to table
         bob_temp = bob_postDisclose.copy()
 
-        alice_reconciled, bob_reconciled = cascade.runCascade(alice_temp, bob_temp, error_rate)
-        if detailed:
-            print('Alice and Bob perform the CASCADE algorithm for error reconciliation')
-            print("Alice's reconciled key:\n",tools.list_to_string(alice_reconciled), sep='')
-            print("Bob's reconciled key:\n", tools.list_to_string(bob_reconciled), sep='')
-            print('Error after CASCADE: ',tools.calculateError(alice_reconciled, bob_reconciled))
+        if error_rate == 0.0:
+            alice_reconciled, bob_reconciled = alice_temp, bob_temp
+        else:
+            alice_reconciled, bob_reconciled = cascade.runCascade(alice_temp, bob_temp, error_rate)
+            if detailed:
+                print('Alice and Bob perform the CASCADE algorithm for error reconciliation')
+                print("Alice's reconciled key:\n",tools.list_to_string(alice_reconciled), sep='')
+                print("Bob's reconciled key:\n", tools.list_to_string(bob_reconciled), sep='')
+                print('Error after CASCADE: ',tools.calculateError(alice_reconciled, bob_reconciled))
 
         alice_final_key, bob_final_key = privacy_amplification.privacy_amp(alice_reconciled, bob_reconciled, disclosed_error)
 
@@ -148,8 +157,8 @@ def simulateBB84(N, eavesdrop_rate, error_rate, eve, detailed):
 
 
         # Only practical for small data sizes
-        table.printTable(alice_bits, alice_bases, eve_bases, bob_bases, bob_bits,
-                alice_sifted,bob_sifted, alice_postDisclose, bob_postDisclose, alice_reconciled,
+        table.printTable(alice_bits, alice_bases, encoded_list, eve_bases, bob_bases, bob_bits,
+                alice_sifted_for_print,bob_sifted_for_print, alice_postDisclose, bob_postDisclose, alice_reconciled,
                 bob_reconciled, alice_final_key, bob_final_key)
 
         return [alice_final_key, bob_final_key]

@@ -1,7 +1,7 @@
 from tabulate import tabulate
     
 def printTable(*arg):
-    row_header = ["Alice's Bits", "Alice's Bases", "Eve's Bases", "Bob's Bases", "Bob's Bits",
+    row_header = ["Alice's Bits", "Alice's Bases", "Encoded Qubits", "Eve's Bases", "Bob's Bases", "Bob's Bits",
             "Alice's Sifted Bits", "Bob's Sifted Bits", "Alice's Bits After Disclosure", 
             "Bob's Bits After Disclosure", "Alice's Key After CASCADE", "Bob's Key After CASCADE",
             "Alice's Final Key", "Bob's Final Key"]
